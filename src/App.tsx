@@ -158,8 +158,28 @@ export default function App() {
         setIsCustomerSpeaking(false);
       }
     } catch (err) {
-      console.warn('[Simulation] Voice turn notice:', err);
-      setIsCustomerSpeaking(false);
+      console.warn('[Simulation] Voice turn network notice, using local responder:', err);
+      // Client-side fallback so customer always responds even if serverless backend is slow or failing
+      const lower = userMessage.toLowerCase();
+      let fallbackText = "Hi, thanks for taking my call! I saw your cleaning voucher online and had a few quick questions.";
+      if (lower.includes('bedroom') || lower.includes('bed') || lower.includes('bath')) {
+        fallbackText = "It's a two bedroom, two bath apartment, about 1,000 square feet. Do your cleaners bring supplies?";
+      } else if (lower.includes('supplies') || lower.includes('vacuum') || lower.includes('mop')) {
+        fallbackText = "Great! Having them bring supplies is helpful. How does the voucher rate transition into the recurring cleans?";
+      } else if (lower.includes('voucher') || lower.includes('membership') || lower.includes('rate') || lower.includes('$19')) {
+        fallbackText = "Got it, so the voucher covers the first clean and locks in $19/hr for recurring cleans with vetted cleaners?";
+      } else if (lower.includes('thursday') || lower.includes('saturday') || lower.includes('book') || lower.includes('schedule')) {
+        fallbackText = "Saturday morning at 9:00 AM works perfectly. Let's get that booked!";
+      }
+
+      const custTurn: ChatTurn = {
+        id: 'cust-' + Math.random().toString(36).substring(2, 9),
+        sender: 'customer',
+        text: fallbackText,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      };
+      setTurns((prev) => [...prev, custTurn]);
+      setTimeout(() => setIsCustomerSpeaking(false), 2000);
     }
   };
 

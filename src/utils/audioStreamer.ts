@@ -236,7 +236,8 @@ export class LiveAudioRecorder {
         sum += inputData[i] * inputData[i];
       }
       const rms = Math.sqrt(sum / inputData.length);
-      const isAudible = rms > 0.018; // Speech threshold
+      // Highly sensitive speech threshold (0.007) so normal spoken conversational levels are caught immediately
+      const isAudible = rms > 0.007;
 
       // Live PCM streaming callback (for WebSocket)
       if (this.onAudioChunk) {
@@ -258,14 +259,14 @@ export class LiveAudioRecorder {
           this.lastSpeechTimestamp = Date.now();
         } else if (this.isSpeakingDetected) {
           this.silenceCounter++;
-          // ~1.2s of silence after speech detected (at ~11 frames per sec with 4096 buffer @ 44.1k/48k)
-          if (this.silenceCounter >= 14 && Date.now() - this.lastSpeechTimestamp > 1200) {
+          // ~800ms of natural silence after speech detected (8 frames with 4096 buffer @ 44.1k/48k)
+          if (this.silenceCounter >= 8 && Date.now() - this.lastSpeechTimestamp > 800) {
             // Speech segment complete: encode to WAV and deliver
             this.flushSpeechSegment();
           }
         } else {
-          // Keep a rolling buffer of 5 frames before speech starts for natural onset
-          if (this.recordedSamples.length > 6) {
+          // Keep a rolling buffer of 4 frames before speech starts for natural onset
+          if (this.recordedSamples.length > 5) {
             const dropped = this.recordedSamples.shift();
             if (dropped) this.totalRecordedLength -= dropped.length;
           }
@@ -458,22 +459,33 @@ export class SpeechRecognizer {
       this.recognition.interimResults = true;
       this.recognition.lang = 'en-US';
 
+      let debounceTimer: any = null;
+      let accumulatedFinal = '';
+
       this.recognition.onresult = (event: any) => {
-        let finalTranscript = '';
         let interimTranscript = '';
 
         for (let i = event.resultIndex; i < event.results.length; ++i) {
           if (event.results[i].isFinal) {
-            finalTranscript += event.results[i][0].transcript;
+            accumulatedFinal += ' ' + event.results[i][0].transcript;
           } else {
             interimTranscript += event.results[i][0].transcript;
           }
         }
 
-        if (finalTranscript.trim()) {
-          this.onResultCallback(finalTranscript.trim(), true);
-        } else if (interimTranscript.trim()) {
+        if (interimTranscript.trim()) {
           this.onResultCallback(interimTranscript.trim(), false);
+        }
+
+        if (accumulatedFinal.trim()) {
+          clearTimeout(debounceTimer);
+          debounceTimer = setTimeout(() => {
+            if (accumulatedFinal.trim()) {
+              const toSend = accumulatedFinal.trim();
+              accumulatedFinal = '';
+              this.onResultCallback(toSend, true);
+            }
+          }, 800);
         }
       };
 

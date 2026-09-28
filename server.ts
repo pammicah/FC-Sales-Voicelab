@@ -466,9 +466,14 @@ app.post('/api/voice-turn', async (req, res) => {
     let audioBase64: string | null = null;
     let mimeType = 'audio/wav';
 
+    // If customer reply is still empty for any reason, provide call-flow fallback
+    if (!customerReply) {
+      customerReply = generateInCharacterFallback(trainee, message, history.length);
+    }
+
     const spokenText = customerReply.replace(/\[.*?\]/g, '').trim();
 
-    if (spokenText) {
+    if (spokenText && apiKey) {
       try {
         const ttsResponse = await ai.models.generateContent({
           model: 'gemini-3.8-flash-lite-tts',
@@ -507,7 +512,15 @@ app.post('/api/voice-turn', async (req, res) => {
     });
   } catch (err: any) {
     console.warn('Error in /api/voice-turn:', err?.message || err);
-    res.status(500).json({ error: err.message || 'Simulation turn error' });
+    // Return graceful conversational fallback rather than 500 error
+    const fallbackReply = generateInCharacterFallback(req.body?.trainee, req.body?.message || '', (req.body?.history || []).length);
+    res.json({
+      success: true,
+      reply: fallbackReply,
+      audio: null,
+      mimeType: 'audio/wav',
+      isTerminated: false,
+    });
   }
 });
 
@@ -848,9 +861,14 @@ async function startServer() {
     });
   }
 
-  server.listen(PORT, '0.0.0.0', () => {
-    console.log(`[Homeaglow Sales Simulator] Server running on port ${PORT}`);
-  });
+  // Only listen directly when not executed in a serverless function wrapper
+  if (!process.env.VERCEL) {
+    server.listen(PORT, '0.0.0.0', () => {
+      console.log(`[Homeaglow Sales Simulator] Server running on port ${PORT}`);
+    });
+  }
 }
 
 startServer();
+
+export default app;
