@@ -153,16 +153,23 @@ STRICT STANDBY RULE: Do NOT speak customer dialogue until the trainee delivers t
 [PHASE 3: In-Character Live Simulation (Continuous Voice)]
 As soon as the trainee delivers their opening spiel, immediately assume the customer persona:
 1. First Customer Turn:
-   - If Call Type is Outbound: "Uh, hello? Yes, who's this? I remember looking at a cleaning promo earlier."
+   - If Call Type is Apex Lead or Outbound: "Uh, hello? Yes, speaking. I do remember seeing an ad or checking out your website. How does it work?"
+   - If Call Type is Revisit Lead: "Hi there! Yeah, I did check you guys out a while ago. Life got busy, but I'm looking at having someone help clean the place now."
    - If Call Type is Inbound: "Hi, thanks for taking my call! I saw your cleaning voucher online and had a few quick questions."
 2. Voice Concurrency & Dialogue Rules:
    - Keep EVERY customer turn between 1 and 3 conversational sentences maximum. Avoid long monologues so spoken flow remains natural.
    - Use colloquial spoken language with natural hesitation (e.g., "Well...", "Honestly...", "I was wondering...", "Wait a second...").
-3. Difficulty Calibration (${difficulty}):
+3. Flow Alignment with Homeaglow FCF V3 Standards:
+   - React positively when the agent asks match-check discovery questions (bed/bath count, square footage, pet policy, routine needs).
+   - Test the agent on membership clarity: "Wait, is there a recurring fee? Why is there a $59 membership?", "Can I just do this one time?", "Are the cleaners trustworthy and background-checked?"
+   - Allow the agent to use E.C.O.C. (Empathize, Clarify, Overcome, Confirm) and negotiate down from $59 to $54/$49 or offer trial/one-time cleans.
+   - When booking, provide realistic details (e.g. 2 bedrooms, 2 bathrooms, 1,100 sq ft, 2 cats, prefer cleaners bring their own supplies).
+   - Listen for mandatory verbatim terms on the final close.
+4. Difficulty Calibration (${difficulty}):
    - Beginner: Cooperative homeowner, asks basic questions about supplies and hours, easily agrees to book.
    - Intermediate: Price-conscious, questions the recurring membership model vs. the voucher promo rate, asks about cleaner background checks.
    - Difficult: Highly skeptical, burnt by a past cleaning company, demands the promo rate as a one-off without any subscription commitment; interrupts and challenges the agent on transparency.
-4. Zero Coaching Rule: NEVER break character or offer advice mid-call. Stay 100% in character as the customer.
+5. Zero Coaching Rule: NEVER break character or offer advice mid-call. Stay 100% in character as the customer.
 
 [PHASE 4: Call Termination & Automatic QA Debrief]
 The simulation ends immediately under either of two conditions:
@@ -388,33 +395,57 @@ function generateInCharacterFallback(
   const diff = trainee.difficulty || 'Intermediate';
 
   if (historyLength === 0) {
-    return trainee.callType === 'Outbound Lead Follow-Up'
-      ? "Uh, hello? Yes, who's this? I remember looking at a cleaning promo earlier."
-      : "Hi, thanks for taking my call! I saw your cleaning voucher online and had a few quick questions.";
-  }
-
-  if (lower.includes('bedroom') || lower.includes('bathroom') || lower.includes('bed') || lower.includes('bath')) {
-    return "It's a two bedroom, two bathroom place, about 1,100 square feet. Do your cleaners bring all their own supplies?";
-  }
-
-  if (lower.includes('supplies') || lower.includes('vacuum') || lower.includes('mop')) {
-    return "Oh good, having them bring the kit is much easier for me. Now, how does the voucher discount actually work?";
-  }
-
-  if (lower.includes('voucher') || lower.includes('membership') || lower.includes('foreverclean') || lower.includes('rate')) {
-    if (diff === 'Difficult') {
-      return "Wait, why is there a monthly membership? I really just wanted this one-time clean for the voucher rate without committing.";
+    if (trainee.callType === 'Apex Lead' || trainee.callType === 'Outbound Lead Follow-Up') {
+      return "Uh, hello? Yes, speaking. I do remember seeing an ad or checking out your website. How does it work?";
+    } else if (trainee.callType === 'Revisit Lead') {
+      return "Hi there! Yeah, I did check you guys out a while ago. Life got busy, but I'm looking at having someone help clean the place now.";
     } else {
-      return "Got it, so the voucher covers the first clean, and the membership locks in the $19 hourly rate if I want future cleans?";
+      return "Hi, thanks for taking my call! I saw your cleaning voucher online and had a few quick questions.";
     }
   }
 
-  if (lower.includes('guarantee') || lower.includes('trust') || lower.includes('background') || lower.includes('safe')) {
-    return "That's very reassuring to hear about the background checks. What days do you have available this week?";
+  // Level 1-2 Discovery: Bed/Bath & Square Footage
+  if (lower.includes('bedroom') || lower.includes('bathroom') || lower.includes('bed') || lower.includes('bath') || lower.includes('rooms')) {
+    return "It's a two bedroom, two bathroom place, about 1,100 square feet. Do your cleaners bring all their own supplies and equipment?";
   }
 
-  if (lower.includes('thursday') || lower.includes('saturday') || lower.includes('slot') || lower.includes('book') || lower.includes('schedule') || lower.includes('morning')) {
+  // Supplies & Pets
+  if (lower.includes('supplies') || lower.includes('vacuum') || lower.includes('mop') || lower.includes('equipment')) {
+    return "Oh good, having them bring the kit is much easier for me. We have two cats as well. How does the voucher discount actually work?";
+  }
+
+  // Pet inquiry
+  if (lower.includes('pet') || lower.includes('cat') || lower.includes('dog')) {
+    return "Yes, we have two friendly indoor cats! Do your cleaners handle fur on couches and rugs?";
+  }
+
+  // Pricing & Membership Inquiry
+  if (lower.includes('voucher') || lower.includes('membership') || lower.includes('foreverclean') || lower.includes('rate') || lower.includes('$19') || lower.includes('$59')) {
+    if (diff === 'Difficult') {
+      return "Wait, why is there a $59 monthly membership? I really just wanted this one-time clean for the voucher rate without committing.";
+    } else {
+      return "Got it, so the voucher covers the first clean, and the ForeverClean membership locks in the $23 hourly rate for future cleans?";
+    }
+  }
+
+  // Objection: Already found a cleaner
+  if (lower.includes('already found') || lower.includes('other cleaner')) {
+    return "Well, I was talking to another local cleaner, but they charge $160 flat. How does your backup coverage and rating guarantee work?";
+  }
+
+  // Trust, background check, insurance
+  if (lower.includes('guarantee') || lower.includes('trust') || lower.includes('background') || lower.includes('safe') || lower.includes('insured')) {
+    return "That's very reassuring to hear about the background checks and ratings. What days do you have available this week?";
+  }
+
+  // Scheduling & Dates
+  if (lower.includes('thursday') || lower.includes('saturday') || lower.includes('slot') || lower.includes('book') || lower.includes('schedule') || lower.includes('morning') || lower.includes('window')) {
     return "Saturday morning around 9:00 AM would be perfect for me. Let's get that scheduled!";
+  }
+
+  // Card or Booking Confirmation
+  if (lower.includes('card') || lower.includes('debit') || lower.includes('credit') || lower.includes('verbatim') || lower.includes('confirm')) {
+    return "I can use a Visa card for that. Can you read back the terms so I know exactly what's covered?";
   }
 
   return "That makes a lot of sense. Can you walk me through the booking details and confirm the appointment?";

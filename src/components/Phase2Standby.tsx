@@ -27,9 +27,11 @@ export const Phase2Standby: React.FC<Phase2StandbyProps> = ({
   }, []);
 
   const sampleReferenceSpiel =
-    trainee.callType === 'Inbound Promo Inquiry'
-      ? `Thank you for calling Homeaglow, my name is ${trainee.name.split(' ')[0]}! How can I make your home sparkle today?`
-      : `Hi, this is ${trainee.name.split(' ')[0]} with Homeaglow! I saw you were checking out our cleaning voucher promo online and wanted to ensure your discount was locked in before it expires.`;
+    trainee.callType === 'Apex Lead' || trainee.callType === 'Outbound Lead Follow-Up'
+      ? `Hi (Customer), this is ${trainee.name.split(' ')[0]} from Homeaglow calling on a recorded line. I noticed you visited one of our websites or have seen one of our ads. I wanted to call to see how we can help schedule a cleaning for you.`
+      : trainee.callType === 'Revisit Lead'
+      ? `Hi (Customer), this is ${trainee.name.split(' ')[0]} from Homeaglow calling on a recorded line. You checked us out a while back, and I can see you recently came back to our site looking into our cleaning services — so I wanted to reach out while it’s fresh. I’d love to hear what brought you back and see how we can help.`
+      : `Thank you for calling Homeaglow, my name is ${trainee.name.split(' ')[0]}! How can I make your home sparkle today?`;
 
   return (
     <div className="max-w-3xl mx-auto py-8 px-4 sm:px-6">

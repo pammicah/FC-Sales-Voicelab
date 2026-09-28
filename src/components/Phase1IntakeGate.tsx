@@ -10,7 +10,7 @@ export const Phase1IntakeGate: React.FC<Phase1IntakeGateProps> = ({ onSubmitInta
   const [traineeName, setTraineeName] = useState('');
   const [trainerName, setTrainerName] = useState('');
   const [waveBatch, setWaveBatch] = useState('');
-  const [callType, setCallType] = useState<'Inbound Promo Inquiry' | 'Outbound Lead Follow-Up'>('Inbound Promo Inquiry');
+  const [callType, setCallType] = useState<TraineeProfile['callType']>('Apex Lead');
   const [difficulty, setDifficulty] = useState<'Beginner' | 'Intermediate' | 'Difficult'>('Intermediate');
   const [voiceName, setVoiceName] = useState('Kore');
   const [rawTextPaste, setRawTextPaste] = useState('');
@@ -39,9 +39,13 @@ export const Phase1IntakeGate: React.FC<Phase1IntakeGateProps> = ({ onSubmitInta
       return;
     }
 
-    let determinedCallType: 'Inbound Promo Inquiry' | 'Outbound Lead Follow-Up' = 'Inbound Promo Inquiry';
-    if (callMatch && callMatch[1].toLowerCase().includes('outbound')) {
-      determinedCallType = 'Outbound Lead Follow-Up';
+    let determinedCallType: TraineeProfile['callType'] = 'Apex Lead';
+    if (callMatch) {
+      const cLower = callMatch[1].toLowerCase();
+      if (cLower.includes('revisit')) determinedCallType = 'Revisit Lead';
+      else if (cLower.includes('apex')) determinedCallType = 'Apex Lead';
+      else if (cLower.includes('outbound')) determinedCallType = 'Outbound Lead Follow-Up';
+      else if (cLower.includes('inbound')) determinedCallType = 'Inbound Promo Inquiry';
     }
 
     let determinedDiff: 'Beginner' | 'Intermediate' | 'Difficult' = 'Intermediate';
@@ -200,7 +204,7 @@ export const Phase1IntakeGate: React.FC<Phase1IntakeGateProps> = ({ onSubmitInta
               <textarea
                 value={rawTextPaste}
                 onChange={(e) => setRawTextPaste(e.target.value)}
-                placeholder={`Trainee Full Name: Alex Rivera\nTrainer / Manager Name: Sarah Jenkins\nWave / Batch Number: Wave 24-B\nCall Type: Inbound Promo Inquiry\nDifficulty Level: Intermediate`}
+                placeholder={`Trainee Full Name: Alex Rivera\nTrainer / Manager Name: Sarah Jenkins\nWave / Batch Number: Wave 24-B\nCall Type: Apex Lead\nDifficulty Level: Intermediate`}
                 rows={6}
                 className="w-full bg-slate-950 border border-slate-700 rounded-xl p-4 text-sm font-mono text-slate-200 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
               />
@@ -211,7 +215,7 @@ export const Phase1IntakeGate: React.FC<Phase1IntakeGateProps> = ({ onSubmitInta
                 type="button"
                 onClick={() => {
                   setRawTextPaste(
-                    `Trainee Full Name: Alex Rivera\nTrainer / Manager Name: Sarah Jenkins\nWave / Batch Number: Wave 24-B\nCall Type: Inbound Promo Inquiry\nDifficulty Level: Intermediate`
+                    `Trainee Full Name: Alex Rivera\nTrainer / Manager Name: Sarah Jenkins\nWave / Batch Number: Wave 24-B\nCall Type: Apex Lead\nDifficulty Level: Intermediate`
                   );
                 }}
                 className="text-xs text-emerald-400 hover:underline"
@@ -287,6 +291,8 @@ export const Phase1IntakeGate: React.FC<Phase1IntakeGateProps> = ({ onSubmitInta
                   onChange={(e) => setCallType(e.target.value as any)}
                   className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
                 >
+                  <option value="Apex Lead">APEX Lead (FCF V3)</option>
+                  <option value="Revisit Lead">Revisit Lead (FCF V3)</option>
                   <option value="Inbound Promo Inquiry">Inbound Promo Inquiry</option>
                   <option value="Outbound Lead Follow-Up">Outbound Lead Follow-Up</option>
                 </select>

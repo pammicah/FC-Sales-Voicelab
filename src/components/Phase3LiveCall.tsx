@@ -455,11 +455,11 @@ export const Phase3LiveCall: React.FC<Phase3LiveCallProps> = ({
             </div>
           </div>
 
-          {/* Quick Objection Helpers & Rebuttal Prompts */}
+          {/* Quick Objection Helpers & Rebuttal Prompts (Official FCF V3 ECOC) */}
           <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-xl backdrop-blur-xl flex-1">
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5 mb-3">
               <Shield className="w-3.5 h-3.5 text-teal-400" />
-              Instant Objection Rebuttals
+              FCF V3 Objection Rebuttals (E.C.O.C.)
             </h3>
 
             <div className="space-y-2.5">
@@ -469,7 +469,17 @@ export const Phase3LiveCall: React.FC<Phase3LiveCallProps> = ({
                   <ChevronRight className="w-3.5 h-3.5 text-slate-500 group-open:rotate-90 transition-transform" />
                 </summary>
                 <p className="mt-2 text-slate-400 text-[11px] leading-relaxed border-t border-slate-800 pt-2">
-                  "Most one-off cleaners charge $150-$200. Homeaglow gives you today's clean at promo rate ($19/$49), plus unlocks ForeverClean VIP rates ($18-$22/hr) for any future cleans with full pause/cancel control anytime."
+                  <strong className="text-emerald-400">ECOC:</strong> "Totally fair! No one likes being stuck in something long-term. Are you concerned about being locked in, or just prefer to book as needed? With us, you can book whenever you want and manage your appointments anytime. It’s fast, flexible, and locks in $23/hr rates."
+                </p>
+              </details>
+
+              <details className="group bg-slate-950/70 border border-slate-800/80 rounded-xl p-3 text-xs cursor-pointer">
+                <summary className="font-semibold text-slate-300 flex items-center justify-between list-none">
+                  <span>"Already found another cleaner"</span>
+                  <ChevronRight className="w-3.5 h-3.5 text-slate-500 group-open:rotate-90 transition-transform" />
+                </summary>
+                <p className="mt-2 text-slate-400 text-[11px] leading-relaxed border-t border-slate-800 pt-2">
+                  <strong className="text-emerald-400">ECOC:</strong> "Totally understand. Are you completely locked in with them or more just trying them out for now? We’ve completed over 2.6M cleanings with 91.4% rated 4.5+ stars, so if you ever need a reliable backup or want to compare, we’d love to be that option."
                 </p>
               </details>
 
@@ -479,17 +489,17 @@ export const Phase3LiveCall: React.FC<Phase3LiveCallProps> = ({
                   <ChevronRight className="w-3.5 h-3.5 text-slate-500 group-open:rotate-90 transition-transform" />
                 </summary>
                 <p className="mt-2 text-slate-400 text-[11px] leading-relaxed border-t border-slate-800 pt-2">
-                  "Every pro undergoes strict multi-tier criminal and identity background checks, is fully insured, and is backed by our Homeaglow Happiness Guarantee. You can even choose your favorite cleaner."
+                  <strong className="text-emerald-400">ECOC:</strong> "Every single cleaner undergoes multi-tier criminal and identity background checks. 91.4% of cleanings are done by 4.5+ star pros, and our work is backed by our Homeaglow Happiness Guarantee."
                 </p>
               </details>
 
               <details className="group bg-slate-950/70 border border-slate-800/80 rounded-xl p-3 text-xs cursor-pointer">
                 <summary className="font-semibold text-slate-300 flex items-center justify-between list-none">
-                  <span>"I need to check with my spouse"</span>
+                  <span>"Need to consult spouse"</span>
                   <ChevronRight className="w-3.5 h-3.5 text-slate-500 group-open:rotate-90 transition-transform" />
                 </summary>
                 <p className="mt-2 text-slate-400 text-[11px] leading-relaxed border-t border-slate-800 pt-2">
-                  "Totally understand! Promo slots are limited—let's tentatively hold Thursday morning so you don't lose the discount. You can reschedule for free up to 24 hours prior."
+                  <strong className="text-emerald-400">ECOC:</strong> "Absolutely! Are you mostly wanting their go-ahead before scheduling, or just looping them in? Let's hold your spot tentatively on Saturday morning so you don't lose the voucher rate while you check in."
                 </p>
               </details>
             </div>
