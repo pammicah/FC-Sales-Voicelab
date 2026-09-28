@@ -1,0 +1,6 @@
+{
+  "name": "Homeaglow Sales Simulator - VoiceLab Edition",
+  "description": "Interactive real-time voice practice engine for Homeaglow sales, booking, and customer acquisition representatives powered by Gemini 3.8 Live API.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
